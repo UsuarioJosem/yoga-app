@@ -54,8 +54,8 @@ function renderRutinas() {
             )
             .join("")}
         </div>
-        <button class="btn btn-primary" data-min="${r.min}" data-routine="${i}">
-          Empezar con temporizador
+        <button class="btn btn-primary" data-routine="${i}">
+          Empezar sesión guiada
         </button>
       </div>`;
   }).join("");
@@ -65,7 +65,7 @@ function renderRutinas() {
     .forEach((b) =>
       b.addEventListener("click", () => {
         switchTab("timer");
-        setPreset(Number(b.dataset.min));
+        Guided.start(RUTINAS[Number(b.dataset.routine)]);
       })
     );
 }
@@ -95,6 +95,138 @@ function renderAsanas() {
           .join("")}`;
     })
     .join("");
+}
+
+// ── Sesión guiada ──
+const Guided = {
+  rutina: null,
+  idx: 0,
+  remain: 0,
+  running: false,
+  ticker: null,
+
+  start(r) {
+    this.stop();
+    this.rutina = r;
+    this.idx = 0;
+    this.remain = r.pasos[0].min * 60;
+    this.running = true;
+    this.ticker = setInterval(() => this._sec(), 1000);
+    renderGuided();
+  },
+
+  _sec() {
+    if (!this.running || !this.rutina) return;
+    if (this.remain > 0) {
+      this.remain--;
+      updateGuidedUI();
+      return;
+    }
+    Timer._beep();
+    this._advance();
+  },
+
+  _advance() {
+    if (this.idx < this.rutina.pasos.length - 1) {
+      this.idx++;
+      this.remain = this.rutina.pasos[this.idx].min * 60;
+      renderGuided();
+    } else {
+      this.finish();
+    }
+  },
+
+  toggle() {
+    this.running = !this.running;
+    updateGuidedUI();
+  },
+
+  skip() {
+    this._advance();
+  },
+
+  finish() {
+    const min = this.rutina.min;
+    this.stop();
+    Store.addSession(min);
+    $("#panel-timer").innerHTML = `
+      <div class="card timer-card">
+        <div class="guided-done">🙏</div>
+        <p class="title" style="font-size:18px;">Sesión completada</p>
+        <p class="meta" style="margin:6px 0 18px;">${min} minutos añadidos a tu progreso</p>
+        <div class="btn-row" style="justify-content:center;">
+          <button class="btn btn-primary" id="doneBtn">Volver a rutinas</button>
+        </div>
+      </div>`;
+    $("#doneBtn").addEventListener("click", () => {
+      renderTimer();
+      switchTab("rutinas");
+    });
+  },
+
+  exit() {
+    this.stop();
+    renderTimer();
+  },
+
+  stop() {
+    this.running = false;
+    clearInterval(this.ticker);
+    this.rutina = null;
+  },
+
+  format() {
+    const m = Math.floor(this.remain / 60);
+    const s = this.remain % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  },
+};
+
+function renderGuided() {
+  const r = Guided.rutina;
+  if (!r) return;
+  const p = r.pasos[Guided.idx];
+  const done = r.pasos.slice(0, Guided.idx).reduce((a, x) => a + x.min, 0);
+  const pct = Math.round((done / r.min) * 100);
+
+  $("#panel-timer").innerHTML = `
+    <div class="card timer-card">
+      <div class="row-between">
+        <p class="meta">${r.t}</p>
+        <button class="btn" id="exitBtn" style="font-size:12px;padding:5px 10px;">Salir</button>
+      </div>
+      <p class="guided-step-label">Paso ${Guided.idx + 1} de ${r.pasos.length}</p>
+      <p class="title" style="font-size:19px;margin-top:2px;">${p.t}</p>
+      ${POSES[p.pose] ? `<div class="pose">${POSES[p.pose]}</div>` : ""}
+      <p class="guided-como">${p.como}</p>
+      <div class="time-display" id="guidedTime" style="font-size:48px;">${Guided.format()}</div>
+      <div class="bar"><div class="bar-fill" id="guidedBar" style="width:${pct}%"></div></div>
+      <p class="meta" id="guidedPct">${pct}% de la rutina</p>
+      <div class="btn-row" style="justify-content:center;margin-top:14px;">
+        <button class="btn btn-primary" id="guidedPlay">${Guided.running ? "Pausar" : "Continuar"}</button>
+        <button class="btn" id="guidedSkip">Saltar paso</button>
+      </div>
+    </div>`;
+
+  $("#guidedPlay").addEventListener("click", () => Guided.toggle());
+  $("#guidedSkip").addEventListener("click", () => Guided.skip());
+  $("#exitBtn").addEventListener("click", () => Guided.exit());
+}
+
+function updateGuidedUI() {
+  const r = Guided.rutina;
+  if (!r) return;
+  const t = $("#guidedTime");
+  if (t) t.textContent = Guided.format();
+  const btn = $("#guidedPlay");
+  if (btn) btn.textContent = Guided.running ? "Pausar" : "Continuar";
+  const stepDone = r.pasos[Guided.idx].min * 60 - Guided.remain;
+  const done = r.pasos.slice(0, Guided.idx).reduce((a, x) => a + x.min, 0) * 60 + stepDone;
+  const pct = Math.min(100, Math.round((done / (r.min * 60)) * 100));
+  const bar = $("#guidedBar");
+  if (bar) bar.style.width = pct + "%";
+  const lbl = $("#guidedPct");
+  if (lbl) lbl.textContent = pct + "% de la rutina";
 }
 
 // ── Temporizador ──

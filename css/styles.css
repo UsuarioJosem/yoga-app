@@ -261,3 +261,20 @@ ol.steps li { margin-bottom: 3px; }
 .step summary::after { margin-left: 0; }
 .step .pose { margin: 0 12px; }
 .step-como { padding: 8px 12px 12px; font-size: 14px; color: var(--text-soft); }
+
+/* ── Sesión guiada ── */
+.guided-step-label {
+  margin: 10px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+.guided-como {
+  font-size: 14px;
+  color: var(--text-soft);
+  margin: 8px 0 4px;
+  text-align: left;
+}
+.guided-done { font-size: 44px; margin: 14px 0 6px; }
