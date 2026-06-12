@@ -53,6 +53,17 @@ const Store = {
     this._save(data);
   },
 
+  // Guía por voz en sesiones guiadas (activada por defecto)
+  getVoice() {
+    const v = this._load().voice;
+    return v === undefined ? true : v;
+  },
+  setVoice(on) {
+    const data = this._load();
+    data.voice = on;
+    this._save(data);
+  },
+
   // Estadísticas agregadas
   stats() {
     const sessions = this.getSessions();

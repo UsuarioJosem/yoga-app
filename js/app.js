@@ -97,6 +97,38 @@ function renderAsanas() {
     .join("");
 }
 
+// ── Guía por voz ──
+// Usa la voz en español del propio dispositivo (Web Speech API).
+const Voice = {
+  enabled: Store.getVoice(),
+  available: "speechSynthesis" in window,
+
+  toggle() {
+    this.enabled = !this.enabled;
+    Store.setVoice(this.enabled);
+    if (!this.enabled) this.stop();
+  },
+
+  speak(text) {
+    if (!this.available || !this.enabled) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "es-ES";
+    u.rate = 0.95;
+    const voice = speechSynthesis
+      .getVoices()
+      .find((v) => v.lang && v.lang.startsWith("es"));
+    if (voice) u.voice = voice;
+    speechSynthesis.speak(u);
+  },
+
+  stop() {
+    if (this.available) speechSynthesis.cancel();
+  },
+};
+// Algunos navegadores cargan las voces de forma asíncrona
+if (Voice.available) speechSynthesis.getVoices();
+
 // ── Sesión guiada ──
 const Guided = {
   rutina: null,
@@ -113,6 +145,12 @@ const Guided = {
     this.running = true;
     this.ticker = setInterval(() => this._sec(), 1000);
     renderGuided();
+    this._announce();
+  },
+
+  _announce() {
+    const p = this.rutina.pasos[this.idx];
+    Voice.speak(`Paso ${this.idx + 1}: ${p.t}, ${p.dur}. ${p.como}`);
   },
 
   _sec() {
@@ -131,6 +169,7 @@ const Guided = {
       this.idx++;
       this.remain = this.rutina.pasos[this.idx].min * 60;
       renderGuided();
+      this._announce();
     } else {
       this.finish();
     }
@@ -138,6 +177,7 @@ const Guided = {
 
   toggle() {
     this.running = !this.running;
+    if (!this.running) Voice.stop();
     updateGuidedUI();
   },
 
@@ -149,6 +189,7 @@ const Guided = {
     const min = this.rutina.min;
     this.stop();
     Store.addSession(min);
+    Voice.speak("Sesión completada. Namasté.");
     $("#panel-timer").innerHTML = `
       <div class="card timer-card">
         <div class="guided-done">🙏</div>
@@ -173,6 +214,7 @@ const Guided = {
     this.running = false;
     clearInterval(this.ticker);
     this.rutina = null;
+    Voice.stop();
   },
 
   format() {
@@ -193,7 +235,15 @@ function renderGuided() {
     <div class="card timer-card">
       <div class="row-between">
         <p class="meta">${r.t}</p>
-        <button class="btn" id="exitBtn" style="font-size:12px;padding:5px 10px;">Salir</button>
+        <div style="display:flex;gap:6px;">
+          ${
+            Voice.available
+              ? `<button class="btn" id="voiceBtn" style="font-size:12px;padding:5px 10px;"
+                   title="Guía por voz">${Voice.enabled ? "🔊 Voz" : "🔇 Voz"}</button>`
+              : ""
+          }
+          <button class="btn" id="exitBtn" style="font-size:12px;padding:5px 10px;">Salir</button>
+        </div>
       </div>
       <p class="guided-step-label">Paso ${Guided.idx + 1} de ${r.pasos.length}</p>
       <p class="title" style="font-size:19px;margin-top:2px;">${p.t}</p>
@@ -211,6 +261,12 @@ function renderGuided() {
   $("#guidedPlay").addEventListener("click", () => Guided.toggle());
   $("#guidedSkip").addEventListener("click", () => Guided.skip());
   $("#exitBtn").addEventListener("click", () => Guided.exit());
+  const vb = $("#voiceBtn");
+  if (vb)
+    vb.addEventListener("click", () => {
+      Voice.toggle();
+      vb.textContent = Voice.enabled ? "🔊 Voz" : "🔇 Voz";
+    });
 }
 
 function updateGuidedUI() {
