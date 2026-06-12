@@ -13,6 +13,106 @@ $("#themeToggle").addEventListener("click", () => {
   applyTheme(next);
 });
 
+// ── Onboarding (primera vez) ──
+const OB_STEPS = [
+  {
+    q: "¿Cuál es tu nivel?",
+    sub: "Podrás cambiarlo cuando quieras.",
+    key: "lvl",
+    opts: [
+      { v: "p", label: "Principiante", desc: "Nunca he practicado o estoy empezando" },
+      { v: "i", label: "Intermedio", desc: "Practico de vez en cuando" },
+      { v: "a", label: "Avanzado", desc: "Practico con regularidad desde hace tiempo" },
+    ],
+  },
+  {
+    q: "¿Qué buscas en tu práctica?",
+    sub: "Usaremos esto para recomendarte rutinas.",
+    key: "obj",
+    opts: [
+      { v: "calma", label: "Calma y descanso", desc: "Relajarme, dormir mejor, soltar tensión" },
+      { v: "fuerza", label: "Fuerza", desc: "Tonificar y ganar estabilidad" },
+      { v: "flex", label: "Flexibilidad", desc: "Espalda, caderas y movilidad" },
+    ],
+  },
+  {
+    q: "¿Cuántos días por semana?",
+    sub: "Ajustaremos tu meta semanal.",
+    key: "days",
+    opts: [
+      { v: 2, label: "2 días", desc: "Un comienzo realista" },
+      { v: 3, label: "3 días", desc: "Ritmo constante" },
+      { v: 5, label: "5 o más", desc: "El yoga como hábito diario" },
+    ],
+  },
+];
+
+function showOnboarding() {
+  const profile = {};
+  let step = 0;
+
+  const ov = document.createElement("div");
+  ov.className = "ob-overlay";
+  document.body.appendChild(ov);
+
+  function render() {
+    const s = OB_STEPS[step];
+    ov.innerHTML = `
+      <div class="ob-card">
+        <div class="ob-dots">${OB_STEPS.map(
+          (_, i) => `<span class="ob-dot ${i <= step ? "on" : ""}"></span>`
+        ).join("")}</div>
+        <p class="ob-q">${s.q}</p>
+        <p class="ob-sub">${s.sub}</p>
+        <div class="ob-opts">
+          ${s.opts
+            .map(
+              (o, i) => `
+            <button class="ob-opt" data-i="${i}">
+              <span class="ob-opt-label">${o.label}</span>
+              <span class="ob-opt-desc">${o.desc}</span>
+            </button>`
+            )
+            .join("")}
+        </div>
+      </div>`;
+
+    ov.querySelectorAll(".ob-opt").forEach((b) =>
+      b.addEventListener("click", () => {
+        profile[s.key] = s.opts[Number(b.dataset.i)].v;
+        if (step < OB_STEPS.length - 1) {
+          step++;
+          render();
+        } else {
+          Store.setProfile(profile);
+          Store.setGoal(Math.min(120, profile.days * 20));
+          ov.remove();
+          renderRutinas();
+        }
+      })
+    );
+  }
+  render();
+}
+
+// ── Recomendación del día ──
+const RECO = {
+  calma: { p: ["Despertar suave", "Yoga para dormir"], i: ["Apertura de cadera"], a: ["Inversiones"] },
+  fuerza: { p: ["Base de pie"], i: ["Core y fuerza", "Los tres guerreros"], a: ["Práctica avanzada"] },
+  flex: { p: ["Espalda sana", "Yoga para dormir"], i: ["Apertura de cadera"], a: ["Inversiones"] },
+};
+
+function rutinaDelDia() {
+  const prof = Store.getProfile();
+  if (!prof) return null;
+  const names = (RECO[prof.obj] && RECO[prof.obj][prof.lvl]) || [];
+  let candidates = RUTINAS.filter((r) => names.includes(r.t));
+  if (!candidates.length) candidates = RUTINAS.filter((r) => r.lvl === prof.lvl);
+  if (!candidates.length) return null;
+  const day = Math.floor(Date.now() / 86400000);
+  return candidates[day % candidates.length];
+}
+
 // ── Navegación por pestañas ──
 function switchTab(name) {
   document.querySelectorAll(".panel").forEach((p) => (p.hidden = true));
@@ -29,7 +129,24 @@ document.querySelectorAll(".tab").forEach((t) =>
 
 // ── Rutinas ──
 function renderRutinas() {
-  $("#panel-rutinas").innerHTML = RUTINAS.map((r, i) => {
+  const hoy = rutinaDelDia();
+  const hoyHtml = hoy
+    ? `
+    <div class="card today-card">
+      <p class="today-label">☀️ Tu rutina de hoy</p>
+      <div class="row-between">
+        <p class="title" style="font-size:18px;">${hoy.t}</p>
+        <span class="lvl ${NIVELES[hoy.lvl].cls}">${NIVELES[hoy.lvl].label}</span>
+      </div>
+      <p class="meta">${hoy.min} min · ${hoy.pasos.length} pasos</p>
+      <button class="btn btn-primary" style="margin-top:10px;" data-routine="${RUTINAS.indexOf(hoy)}">
+        Empezar ahora
+      </button>
+    </div>
+    <p class="section-label">Todas las rutinas</p>`
+    : "";
+
+  $("#panel-rutinas").innerHTML = hoyHtml + RUTINAS.map((r, i) => {
     const lv = NIVELES[r.lvl];
     return `
       <div class="card">
@@ -413,7 +530,13 @@ function renderProgreso() {
               .join("")
           : `<p class="empty">Aún no hay sesiones. Completa una con el temporizador para empezar a sumar.</p>`
       }
+    </div>
+
+    <div class="btn-row" style="justify-content:center;margin:4px 0 10px;">
+      <button class="btn" id="prefsBtn" style="font-size:13px;">Cambiar mis preferencias</button>
     </div>`;
+
+  $("#prefsBtn").addEventListener("click", () => showOnboarding());
 
   $("#panel-progreso")
     .querySelectorAll("[data-goal]")
@@ -430,3 +553,4 @@ renderRutinas();
 renderAsanas();
 renderTimer();
 switchTab("rutinas");
+if (!Store.getProfile()) showOnboarding();

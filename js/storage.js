@@ -53,6 +53,16 @@ const Store = {
     this._save(data);
   },
 
+  // Perfil del usuario (nivel, objetivo, días por semana)
+  getProfile() {
+    return this._load().profile || null;
+  },
+  setProfile(profile) {
+    const data = this._load();
+    data.profile = profile;
+    this._save(data);
+  },
+
   // Guía por voz en sesiones guiadas (activada por defecto)
   getVoice() {
     const v = this._load().voice;
