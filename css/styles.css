@@ -336,3 +336,66 @@ ol.steps li { margin-bottom: 3px; }
   text-transform: uppercase;
   color: var(--accent-deep);
 }
+
+/* ── Pulido visual ── */
+body { transition: background 0.3s ease, color 0.3s ease; }
+
+/* Entrada suave de cada pestaña */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.panel:not([hidden]) { animation: rise 0.28s ease; }
+
+/* Barra de pestañas fija con desenfoque */
+.tabbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* Tarjetas con profundidad */
+.card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.3s ease;
+}
+.card:hover { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07); }
+
+/* Acento de nivel en las tarjetas de rutina */
+.rcard { border-left: 4px solid var(--border); }
+.rcard.edge-p { border-left-color: var(--lvl-p-fg); }
+.rcard.edge-i { border-left-color: var(--lvl-i-fg); }
+.rcard.edge-a { border-left-color: var(--lvl-a-fg); }
+
+/* Botón principal con degradado */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  border: none;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: transform 0.1s, box-shadow 0.2s, filter 0.2s;
+}
+.btn-primary:hover { filter: brightness(1.06); box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 45%, transparent); }
+[data-theme="dark"] .btn-primary { background: linear-gradient(135deg, var(--accent), #3da583); }
+
+/* Marca y tarjeta del día con degradado */
+.brand-mark { background: linear-gradient(145deg, var(--accent-soft), color-mix(in srgb, var(--accent) 28%, var(--accent-soft))); }
+.today-card {
+  background: linear-gradient(150deg, var(--accent-soft), color-mix(in srgb, var(--accent) 14%, var(--surface)));
+}
+
+/* Barra de progreso con degradado y chips suaves */
+.bar-fill { background: linear-gradient(90deg, var(--accent), var(--accent-deep)); }
+.chip { transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.chip:hover { border-color: var(--accent); color: var(--accent-deep); }
+.tab { transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s; }
+.tab:active { transform: scale(0.97); }
+
+/* Ilustraciones un poco más presentes */
+.pose { background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface-2)); border: none; }

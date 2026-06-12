@@ -5,10 +5,13 @@
 const _P = (body) =>
   `<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" fill="none"
         stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"
-        role="img" aria-hidden="true">${body}</svg>`;
+        role="img" aria-hidden="true">
+     <circle cx="100" cy="72" r="58" fill="currentColor" opacity="0.07" stroke="none"/>
+     <circle cx="146" cy="34" r="13" fill="currentColor" opacity="0.18" stroke="none"/>
+     ${body}</svg>`;
 
 const _HEAD = (x, y) => `<circle cx="${x}" cy="${y}" r="9" fill="currentColor" stroke="none"/>`;
-const _GROUND = `<line x1="14" y1="128" x2="186" y2="128" stroke-width="3" opacity="0.25"/>`;
+const _GROUND = `<rect x="26" y="124" width="148" height="7" rx="3.5" fill="currentColor" opacity="0.15" stroke="none"/>`;
 
 const POSES = {
   // ── Principiante ──

@@ -149,7 +149,7 @@ function renderRutinas() {
   $("#panel-rutinas").innerHTML = hoyHtml + RUTINAS.map((r, i) => {
     const lv = NIVELES[r.lvl];
     return `
-      <div class="card">
+      <div class="card rcard edge-${r.lvl}">
         <div class="row-between">
           <p class="title">${r.t}</p>
           <span class="lvl ${lv.cls}">${lv.label}</span>
