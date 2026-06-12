@@ -1,0 +1,19 @@
+{
+  "name": "Sādhana · Yoga",
+  "short_name": "Sādhana",
+  "description": "Aprende y practica yoga desde principiante hasta avanzado.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f1ea",
+  "theme_color": "#1d9e75",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
