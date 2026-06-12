@@ -1,5 +1,5 @@
 // ── Service Worker ── funcionamiento sin conexión
-const CACHE = "sadhana-v2";
+const CACHE = "sadhana-v4";
 const ASSETS = [
   "./",
   "./index.html",

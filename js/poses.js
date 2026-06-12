@@ -91,6 +91,25 @@ const POSES = {
     <line x1="68" y1="92" x2="52" y2="124"/>
     <line x1="134" y1="94" x2="148" y2="124"/>`),
 
+  // ── Posturas auxiliares de las rutinas ──
+  "Savasana": _P(`${_GROUND}${_HEAD(30, 112)}
+    <line x1="42" y1="116" x2="138" y2="116"/>
+    <line x1="138" y1="116" x2="166" y2="111"/>
+    <line x1="138" y1="116" x2="166" y2="121"/>
+    <line x1="58" y1="118" x2="92" y2="123"/>`),
+
+  "Surya Namaskar": _P(`${_GROUND}${_HEAD(100, 32)}
+    <line x1="100" y1="42" x2="100" y2="84"/>
+    <line x1="100" y1="56" x2="84" y2="18"/>
+    <line x1="100" y1="56" x2="116" y2="18"/>
+    <line x1="100" y1="84" x2="93" y2="126"/>
+    <line x1="100" y1="84" x2="107" y2="126"/>`),
+
+  "Uttanasana": _P(`${_GROUND}${_HEAD(70, 106)}
+    <line x1="103" y1="126" x2="100" y2="62"/>
+    <path d="M100,62 Q80,70 73,98"/>
+    <line x1="84" y1="82" x2="64" y2="124"/>`),
+
   "Eka Pada Rajakapotasana": _P(`${_GROUND}${_HEAD(86, 42)}
     <line x1="86" y1="52" x2="88" y2="98"/>
     <line x1="86" y1="62" x2="66" y2="98"/>

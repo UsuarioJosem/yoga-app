@@ -221,3 +221,43 @@ ol.steps li { margin-bottom: 3px; }
   height: 119px;
   color: var(--accent);
 }
+
+/* ── Pasos desplegables de rutinas ── */
+.steps { margin: 10px 0 14px; display: flex; flex-direction: column; gap: 6px; }
+.step {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.step summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+.step summary::-webkit-details-marker { display: none; }
+.step summary::after {
+  content: "▾";
+  margin-left: auto;
+  color: var(--text-faint);
+  transition: transform 0.2s;
+}
+.step[open] summary::after { transform: rotate(180deg); }
+.step-num {
+  flex: none;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-size: 12px; font-weight: 700;
+}
+.step-name { font-weight: 600; flex: 1; }
+.step-dur { color: var(--text-faint); font-size: 13px; margin-left: auto; padding-right: 6px; white-space: nowrap; }
+.step summary::after { margin-left: 0; }
+.step .pose { margin: 0 12px; }
+.step-como { padding: 8px 12px 12px; font-size: 14px; color: var(--text-soft); }

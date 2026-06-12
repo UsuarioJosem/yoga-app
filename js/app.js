@@ -38,7 +38,22 @@ function renderRutinas() {
           <span class="lvl ${lv.cls}">${lv.label}</span>
         </div>
         <p class="meta">${r.min} min · ${r.pasos.length} pasos</p>
-        <ol class="steps">${r.pasos.map((p) => `<li>${p}</li>`).join("")}</ol>
+        <div class="steps">
+          ${r.pasos
+            .map(
+              (p, j) => `
+            <details class="step">
+              <summary>
+                <span class="step-num">${j + 1}</span>
+                <span class="step-name">${p.t}</span>
+                <span class="step-dur">${p.dur}</span>
+              </summary>
+              ${POSES[p.pose] ? `<div class="pose">${POSES[p.pose]}</div>` : ""}
+              <p class="step-como">${p.como}</p>
+            </details>`
+            )
+            .join("")}
+        </div>
         <button class="btn btn-primary" data-min="${r.min}" data-routine="${i}">
           Empezar con temporizador
         </button>
