@@ -72,6 +72,7 @@ function renderAsanas() {
               <span class="lvl ${lv.cls}">${lv.label}</span>
             </div>
             <p class="subtitle">${a.es}</p>
+            ${POSES[a.n] ? `<div class="pose">${POSES[a.n]}</div>` : ""}
             <p style="margin:8px 0 6px;font-size:14px;">${a.desc}</p>
             <p class="cue">Foco: ${a.foco}</p>
           </div>`

@@ -205,3 +205,19 @@ ol.steps li { margin-bottom: 3px; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ── Ilustración de postura ── */
+.pose {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 4px;
+  padding: 6px 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.pose svg {
+  width: 170px;
+  height: 119px;
+  color: var(--accent);
+}
